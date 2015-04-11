@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html>
+<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+		<title>MicroBlogging - Topic</title>
+		
+		<!-- Google font -->
+		<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Gafata">
+		
+		<!-- Bootstrap CSS -->
+		<link rel="stylesheet" href="css/bootstrap.css"> 
+		
+		<!-- CSS style -->
+		<link rel="stylesheet" href="css/style.css"> 
+		
+		<!-- jQuery -->
+		<script src="js/jquery-2.1.1.min.js"></script>
+		
+		<!-- Bootstrap JS -->
+		<script src="js/bootstrap.min.js"></script>
+		
+		<!-- AngularJS library -->
+	<script src= "http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
+			
+				<script>
+		
+				
+				
+		var uID,uIDchange=false; // Global Variable
+		
+		// detect hash change and call functions from angularJS scope controller
+		$(window).on('hashchange', function() {
+			var x = location.hash;
+			uID = x.substring(1); // ignore the #
+			angular.element(document.getElementById('MessagesApp')).scope().InitMessages();
+			angular.element(document.getElementById('MessagesApp')).scope().ChangeUrl();
+			$('#PageHeader').html('Last 10 Messages about #'+uID); // change Page header title
+			uIDchange = true; // uIDchange is true
+			});
+		
+		var x = location.hash;
+		uID = x.substring(1);
+		$(document).ready(function() {
+		
+	    $(window).load(function () {
+	        setTimeout(function(){
+			// if Param is undefined then no topic to show then send user to microblog.html
+	        if(typeof(uID) == "undefined")
+	        	window.location.pathname = "/MicroBlog/microblog.html";
+	        	
+			$.ajax({
+		        url: "/MicroBlog/user/SessionAuth",
+		        type: 'GET',
+		        contentType: "application/json; charset=utf-8",
+		        success: function(data) {
+		        	if(data.result == "success"){
+						console.log("success");
+						$('#PageHeader').html('Last 10 Messages about #'+uID); // change Page header title
+		    		}
+		        }
+		    	})
+				
+		    	.done(function (data) {
+		    		if(data.result == "success"){
+						console.log("success");
+		    		}
+			        	else{ window.location.pathname = "/MicroBlog/index.html"; } // if Authintication failed send user to index.html
+		    	 })
+		    	 .fail( function (data) {
+		    		 console.log(data);
+		    	 });
+			$('#preloader').fadeOut('slow', function () { // fadeOut preloader in 2 sec
+				//$(".navbar").fadeIn(); // on the same time make navBar fadeIn
+            });
+        },2000);
+
+    });
+	    
+	    // will logout the user. 
+	    $("#logout_btn").click(function() {
+	    	$.ajax({
+		        url: "/MicroBlog/user/LogoutUser",
+		        type: 'GET'
+		    	}).done(function (data) {
+		    		if(data.result == "success"){
+						window.location.pathname = "/MicroBlog/index.html";
+		    		}
+		    	 }).fail( function (data) {
+		    		 console.log(data.result);
+		    	 });
+	    	
+	    	});
+	    
+	    
+		});
+	    
+		</script>
+		
+</head>
+<body>
+<div id="TopDiv"></div>
+<div id="preloader"></div>
+ <!-- Fixed navbar -->
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">MicroBlog</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="microblog.html"><span class="glyphicon glyphicon-globe" aria-hidden="true"></span> Discover</a></li>
+            <li><a href="popular_topics.html"><span class="glyphicon glyphicon-certificate" aria-hidden="true"></span> TOP Topics</a></li>
+            <li id="profileLi"><a href="profile.html"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> My Profile</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="#" id="logout_btn">Logout</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+
+      <!-- Main component for a primary marketing message or call to action -->
+      <div class="jumbotron">
+        
+       <div class="row">
+  <div class="col-md-2">
+
+  </div>
+  <div class="col-md-8">
+  
+  <div class="page-header">
+  <h2 id="PageHeader"></h2>
+</div>
+<div class="alert alert-success alert-dismissible alertRepublishSuc" role="alert">
+Message Republished successfuly!
+</div>
+<div class="alert alert-success alert-dismissible alertPostMsgSuc" role="alert">
+Message Posted successfuly!
+</div>
+<div class="alert alert-danger alert-dismissible alertPostMsgEmpty" role="alert">
+Please Enter a message!
+</div>
+<div class="alert alert-danger alert-dismissible FollowMsgDiv" role="alert">
+</div>
+<div id="MessagesApp" class="messages-container" ng-app="MessagesApp" ng-controller="MessagesController">
+<div class="alert alert-info alert-dismissible alertNewUpdates" role="alert">
+NEW MESSAGES WERE POSTED, CLICK <a href="javascript:void(0);" ng-click="PullUpdates();">HERE</a> TO SEE <b>UPDATES!</b>
+</div>
+		<div id="PostMsgDiv" class="media">
+			<div class="form-group">
+				<textarea class="form-control" id="txtMsg" ng-model="txtMsg" maxlength="140" placeholder="Your Message" cols="8" rows="4"></textarea>
+			</div>
+			<div class="form-group pull-right">
+				<button type="button" class="btn btn-primary" ng-click="btn_post_msg();">Post</button>
+			</div>
+		</div>
+		<div class="MessagesDiv">
+		<div ng-repeat="msg in msgsArray" class="media">
+		  <a class="media-left" href="#">
+		    <img class="msgPhoto" ng-src={{msg.user.PhotoURL}} alt="Photo">
+		  </a>
+		  <div class="media-body">
+		    <h4 class="media-heading">
+		    <b><a ng-href="{{getNicknameAsLink(msg.Posted_by_Nickname);}}">
+		    @{{ msg.Posted_by_Nickname }}</a></b>
+		    {{ msg.pubDate }}
+		    </h4>
+		    <p ng-bind-html="TrustMsgContent(msg.Content)">
+		   <!--   {{ msg.Content }}-->
+		    </p>
+		    <span>
+		    <a href="javascript:void(0);" ng-click="RepublishMsg(msg.Content,msg.msgID);">Republish</a> |
+		    <a href="javascript:void(0);" ng-click="ReplyToMsgModalPop(msg.Posted_by_Nickname);">Reply</a> |
+		    <a href="javascript:void(0);" ng-click="FollowUser(msg.Posted_by_userID,msg.Posted_by_Nickname);">Follow</a>
+		    </span>
+		  </div>
+		  <hr>
+		</div>
+</div>
+
+<!-- Reply Modal -->
+
+<div class="modal fade" id="MsgReplyModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Reply To Message</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+				<textarea autofocus class="form-control" ng-model="replyText" id="replyText" maxlength="140" placeholder="Your Message" cols="8" rows="4"></textarea>
+			</div>
+			<div class="form-group pull-right">
+				<button type="button" class="btn btn-primary" ng-click="ReplyToMsg();" >Post Reply</button>
+			</div>
+        <br><br>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Reply Modal -->
+
+</div>
+  </div>
+   <div class="col-md-2">
+
+  </div>
+</div> 
+        
+      </div>
+
+    </div> <!-- /container -->
+ 
+ <!-- AngularJS module -->
+ 
+ <script>
+ var app = angular.module('MessagesApp',[])
+	.controller('MessagesController', ['$scope','$sce','$http','$interval', function($scope,$sce,$http,$interval) {
+		
+		//Get All Users in json array to check name if exist before parsing it.
+		var usersArray,init_Interval = 0;
+		$http.get("/MicroBlog/user/GetAllUsers")
+			.success(function(response){
+				usersArray = response;
+	});
+
+	var gurl,gurlChange = false;
+	$scope.ChangeUrl = function(){	
+	
+	    if(typeof(uID) == "undefined"){
+	    	gurl = "/MicroBlog/message/GetMessagesByTopic/topic/";
+	    }
+	    else{ 
+	    	gurl = "/MicroBlog/message/GetMessagesByTopic/topic/" + uID;
+	    }
+	};
+	
+	$scope.ChangeUrl();
+	   
+	//$http is AngularJS way to do ajax-like communications
+	$scope.InitMessages = function(){ $interval(function(){
+	$http.get(gurl)
+			.success(function(response) {
+				// if first time showing page OR uID(hash) was changed then assign response to msgsArray
+				if(typeof($scope.msgsArray) == 'undefined' || uIDchange == true){
+					$scope.msgsArray = response; //this variable will hold the Msgs of users
+					uIDchange = false;
+					   }
+				// it is enough to chech whether first messages doesn't have the same id to show the alert of new updates.
+				// and uIDchange is false
+				else if(response[0].msgID != $scope.msgsArray[0].msgID && uIDchange == false){
+						$('.alertNewUpdates').show();
+				}
+				// loop over and check if photoURL empty, then change it to the default image.
+			   	for (var i = $scope.msgsArray.length - 1; i >= 0; i--) {
+				    if($scope.msgsArray[i].user.PhotoURL ==""){
+				    	$scope.msgsArray[i].user.PhotoURL = "images/default-photo.png";
+				    }
+				    }
+			   
+			});
+	},2000);
+	};
+	
+	$scope.InitMessages();
+
+	// a function to pull updates
+	$scope.PullUpdates = function() {
+		
+		$http.get(gurl)
+		.success(function(response) {
+				$scope.msgsArray = response; //this variable will hold the Msgs of users
+				$('.alertNewUpdates').hide(1000); // hide alert
+				// loop over and check if photoURL empty, then change it to the default image.
+		   		for (var i = $scope.msgsArray.length - 1; i >= 0; i--) {
+			    	if($scope.msgsArray[i].user.PhotoURL ==""){
+			    	$scope.msgsArray[i].user.PhotoURL = "images/default-photo.png";
+			    	}
+			    }
+		});	
+	};
+	
+	// make nickname clickable
+	$scope.getNicknameAsLink = function(nickname)
+	{
+	return "profile.html?name="+nickname;
+	};
+	
+	// message posted by current user in Topic UI will show if and only if it contains a # with the topic being shown.
+	$scope.btn_post_msg = function() {
+		
+        if($('#txtMsg').val().trim().length > 0){
+        	
+        	//create js object
+    		var Msg = new Object();
+    	    Msg.Content = $scope.txtMsg;
+    	    
+    	    //Make http call to the server
+        	var req = $http({
+                method: "post",
+                url: "/MicroBlog/message/PostMessage",
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json',
+    	        data: JSON.stringify(Msg)
+            });
+    	    
+    	    req.success(function(response) {
+    	    	$('.alertPostMsgSuc').show(1000).delay(3000).hide(1000); // show for 3 second and hide
+    	    	$scope.txtMsg = "";
+    	    	//Scroll to top TopDiv positioned first on body
+    	    	$('html, body').animate({
+    	            scrollTop: $("#TopDiv").offset().top
+    	        }, 1000);
+    		});	
+
+        }
+        else{
+        $('.alertPostMsgEmpty').show(1000).delay(3000).hide(1000); // show for 3 second and hide
+        }
+    };
+	
+ 	// republish message fun
+	$scope.RepublishMsg = function(Content,msgID){
+		
+ 		//create js object
+		var Msg = new Object();
+	    Msg.msgID = msgID;
+	    Msg.Content = Content;
+		
+	  //Make an http call to the server
+	    var req = $http({
+            method: "post",
+            url: "/MicroBlog/message/RepublishMsg",
+            dataType: 'json',
+            contentType: "application/json; charset=utf-8",
+	        data: JSON.stringify(Msg)
+        });
+	    
+	    req.success(function(response) {
+	    	//Scroll to top TopDiv positioned first on body
+	    	$('html, body').animate({
+	            scrollTop: $("#TopDiv").offset().top
+	        }, 1000);
+	    	// Pull Updates after republish success
+	    	$scope.PullUpdates()
+	    	$('.alertRepublishSuc').show(1000).delay(3000).hide(1000); // show for 3 second and hide
+		});
+	    
+		};
+	
+		// check if nickname is legal before parsing it
+		var isNicknameLegal = function(nickname) {
+			for(var i = 0 ; i< usersArray.length ; i++){
+				if(usersArray[i].Nickname == nickname)
+					{
+					return true;
+					}
+			}
+			return false;
+			//alert(usersArray[0].userID);
+		}
+		
+		// parse Nicknames fun
+		var parseUsername = function(text) {
+			// will add a link to a word starting with @ and contains A-Za-z and 0-9 & underscore, after checking it's legal nickname.
+			return text.replace(/[@]+[A-Za-z0-9-_]+/g, function(u) { 
+				var username = u.replace("@","");
+				if(isNicknameLegal(username)){
+					return u.link("profile.html?name="+username);	
+				}
+				else{
+					return "@"+username;
+				}
+			});
+		};
+		
+		//parsing hashtag the same way parseUsername works
+		var parseHashtag = function(text) {
+			return text.replace(/[#]+[A-Za-z0-9-_]+/g, function(t) {
+				var tag = t.replace("#",""); // %23
+				//return t.link("topic.html?search="+tag);
+				return t.link("topic.html#"+tag);
+			});
+		};
+	
+	// show reply modal fun
+	$scope.ReplyToMsgModalPop = function(nickname){
+		$scope.replyText = "@"+nickname; // set replyText textarea value to @nickname
+		$('#MsgReplyModal').modal('show'); // show reply modal 
+		};
+	
+	
+	// reply to message fun
+	$scope.ReplyToMsg = function(){
+			
+	        if($scope.replyText !=''){
+	        	
+	        	// create js object
+	    		var Msg = new Object();
+	    	    Msg.Content = $scope.replyText;
+	    	    
+	    	 	// make a call to the server
+	        	var req = $http({
+	                method: "post",
+	                url: "/MicroBlog/message/PostMessage",
+	                dataType: 'json',
+	                contentType: "application/json; charset=utf-8",
+	    	        data: JSON.stringify(Msg)
+	            });
+	    	    
+	    	    req.success(function(response) {
+	    	    	// hide modal after replying is done
+	    			$('#MsgReplyModal').modal('hide');
+	    	    	$('.alertPostMsgSuc').show(1000).delay(3000).hide(1000); // show for 3 second and hide
+	    		});	
+
+	        }
+	        else{
+	        alert('Please Enter a message!');
+	        }
+			
+			};
+	
+	// follow user fun
+	$scope.FollowUser = function(userID,nickname){		
+	    
+		$http.get("/MicroBlog/FollowUser/id/"+userID)
+		.success(function(response) {
+			if(response.result == 'success'){
+		    	alert("You started following "+nickname);
+		    	}
+		    	else if(response.result == 'fail')
+		    		{
+			    	//Scroll to top TopDiv positioned first on body
+			    	$('html, body').animate({
+			            scrollTop: $("#TopDiv").offset().top
+			        }, 1000);
+		    		$('.FollowMsgDiv').html(response.message+"@"+nickname).show(1000).delay(3000).hide(1000);
+		    		}
+		   
+		});
+		};
+		
+		$scope.TrustMsgContent = function(content){
+			var temp_content;
+			// parse message content and trust it as html.
+		    temp_content = parseUsername(content);
+		    temp_content = parseHashtag(temp_content);
+			return $sce.trustAsHtml(temp_content);
+	};
+		
+	
+}]);
+
+
+	
+</script>
+
+ <!-- AngularJS module -->  
+
+
+    
+   <!-- Modal Javascript -->
+    <script>
+	
+    $('#MsgReplyModal').on('shown.bs.modal', function () {
+        $('#replyText').focus(); // as soon as the modal shown focus on textarea        
+    })
+    
+	</script>
+    <!-- Modal Javascript -->
+    
+
+
+</body>
+</html>

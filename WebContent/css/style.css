@@ -1,0 +1,319 @@
+
+#preloader {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 999;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    background: #EDEDED url('../images/loader.gif') no-repeat center center;
+}
+/*Hide all alerts*/
+.alertPostMsgEmpty{ display:none; }
+.FollowMsgDiv { display:none; }
+.alertNewUpdates { display:none; }
+.alertPostMsgSuc { display:none; }
+.alertRepublishSuc { display:none; }
+.alertUserExist { display:none; }
+.alertUserSuccess { display:none; }
+.alertUserInvalid { display:none; }
+.notice { display:none; color:red; }
+
+.MessagesDiv{
+	padding-top:30px;
+}
+
+.rectChart{
+		cursor: pointer;
+}
+
+.rectChart:hover {
+	fill:#19a7f7;
+}
+
+hr {
+  -moz-border-bottom-colors: none;
+  -moz-border-image: none;
+  -moz-border-left-colors: none;
+  -moz-border-right-colors: none;
+  -moz-border-top-colors: none;
+  color: #E0E0E0;
+  border-style: solid none;
+  border-width: 1px 0;
+  margin: 5px 0;
+}
+
+#LoadingViewDiv { 
+			display:none;
+			z-index: 200;
+			padding-top:100px;
+			margin-left: auto;
+			margin-right: auto;
+			background:#eee;
+				}
+img.loading_messages {
+    display: block;
+    margin-left: auto;
+    margin-right: auto }
+
+		input.invalid, textarea.invalid{
+			border: 1px solid red;
+		}
+
+		html { 
+			background: url('../images/background-login.png') no-repeat center center fixed; 
+			-webkit-background-size: cover;
+			-moz-background-size: cover;
+			-o-background-size: cover;
+			background-size: cover;
+		}
+
+body {
+	font-family: Gafata, 'Open Sans', Arial, sans-serif;
+}
+
+h2 {
+	margin: 0 0 5px;
+}
+
+h3 {
+	margin: 0 0 20px;
+}
+
+.header h1 {
+	margin: 50px 0;
+	font-size: 36px;
+	line-height: 50px;
+	color: #fff;
+	text-shadow: 0 0 10px rgba(0, 0, 0, 1);
+	text-align:center;
+}
+
+.content {
+	margin-bottom: 50px;
+	padding: 50px 0;
+}
+
+a,
+.btn-link {
+	color: #3fc0eb;
+}
+
+a:hover,
+.btn-link:hover {
+	text-decoration: none;
+	color: #999;
+}
+
+fieldset {
+	margin: 0 0 30px;
+}
+
+	fieldset legend {
+		padding: 5px 0;
+		font-size: 18px;
+	}
+	
+label {
+	margin: 0;
+	font-weight: normal;
+}
+
+.strong {
+	font-weight: bold;
+}
+
+
+.control-label {
+	display: block; /* display it as a block element */
+	padding: 6px; /* pad 6px to all sides */
+	font-size: 12px;
+	line-height: 22px; /* distance between lines 22px */
+	text-transform: uppercase; /* Make letters uppercase */
+	font-weight: normal;
+	color: #999;
+	background: rgba(0, 0, 0, 0.014);
+}
+
+.form-control {
+	font-weight: normal;
+	border: 1px solid #ddd;
+	/* Remove all shadows and radius borders */
+	-webkit-box-shadow:	none !important;
+	-moz-box-shadow:	none !important;
+	box-shadow:			none !important;
+	-webkit-border-radius:	0 !important;
+	-moz-border-radius:		0 !important;
+	border-radius:			0 !important;
+}
+
+/* on focus change border color */
+.form-control:focus {
+	border-color: #4fd0fb;
+}
+
+
+.btn {
+	position: relative;
+	overflow: hidden;
+	background: transparent;
+	z-index: 1;
+	-webkit-border-radius:	0;
+	-moz-border-radius:		0;
+	border-radius:			0;
+	-webkit-box-shadow:	none !important;
+	-moz-box-shadow:	none !important;
+	box-shadow:			none !important;
+	-webkit-transition:	all 0.3s;
+	-moz-transition:	all 0.3s;
+	transition:			all 0.3s;
+}
+
+.btn:hover {
+	background: transparent;
+}
+
+.btn:before {
+	position: absolute;
+	content: '';
+	top: -1px;
+	right: -1px;
+	bottom: -1px;
+	left: -1px;
+	z-index: -1;
+	-webkit-transition:	all 0.5s;
+	-moz-transition:	all 0.5s;
+	transition:			all 0.5s;
+}
+
+/* Customized bootstrap buttons  */
+
+.btn:hover:before {
+	opacity: 0.2;
+}
+
+
+.btn-default,
+.btn-default:hover	{ border-color: #ccc; }	
+.btn-default:before	{ background: #f0f0f0; }
+.btn-default:hover	{ color: #999; }	
+
+.btn-primary,
+.btn-primary:hover	{ border-color: #0f9fcf; }
+.btn-primary:before	{ background: #4fd0fb; }
+.btn-primary:hover	{ color: #0f9fcf; }
+
+.panel.panel-form,
+.panel.panel-form .panel-heading,
+.panel.panel-form .panel-footer {
+	-webkit-border-radius:	0;
+	-moz-border-radius:		0;
+	border-radius:			0;
+}
+
+/* Customized bootstrap buttons  */
+
+
+
+/* customizing panel-heading bootstrap component  */
+
+/*header*/
+	.panel.panel-form .panel-heading {
+		text-align: center; /*text to center*/
+		border-bottom: 7px solid #eee; /* border bottom make it 7px solid with color #eee */
+		color: #d6f5ff; /* Font color */
+		background: #4fd0fb; /* Background color */
+	}
+	
+		.panel.panel-form .panel-heading a {
+			color: #fff; /* a link inside panel-heading will be colored white */
+			text-decoration: underline; /* as well it will be underlined */
+		}
+		
+		.panel.panel-form .panel-heading a:hover {
+			text-decoration: none;
+		}
+		
+		.panel.panel-form .panel-heading p {
+			margin: 0;
+		}
+	
+		/* customizing title inside panel-heading */
+		.panel.panel-form .panel-heading .title {
+			position: relative;
+			margin: 0 0 10px; /* top margin 10px; */
+			font-weight: bold;
+			color: #fff;
+			text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1); /* Shadow transparency 0.1  */
+		}
+		
+			.panel.panel-form .panel-heading .title:before {
+				position: absolute;
+				content: '';
+				bottom: -8px;
+				left: 50%;
+				width: 30px;
+				height: 0;
+				margin-left: -15px;
+				border-bottom: 1px solid rgba(100%, 100%, 100%, 0.3);
+			}
+	
+	/* customizing the panel-body */
+	.panel.panel-form .panel-body {
+		padding: 30px; /* pad the elements 30px bottom down left and right */
+		background: #fcfcfc;
+	}
+	
+	/* footer */
+	.panel.panel-form .panel-footer {
+		border-top: 1px solid #e6e6e6;
+		color: #aaa;
+		background: #f6f6f6;
+	}
+
+.navbar-default .navbar-nav > .active > a,
+.navbar-default .navbar-nav > .active > a:hover,
+.navbar-default .navbar-nav > .active > a:focus {
+  color: #FFF;
+  background-color: #4fd0fb;
+}
+
+.navbar-default .navbar-nav > li > a:hover,
+.navbar-default .navbar-nav > li > a:focus {
+  color: #FFF;
+  background-color: #4fd0fb;
+}
+
+.jumbotron{
+	padding : 70px 0;
+}
+
+.jumbotron p {
+	font-size:16px;
+}
+
+.media-left > img {
+	height:50px;
+	width:50px;
+}
+
+.media-body > p {
+	font-size:14px;
+	margin-bottom:5px;
+}
+
+.media-heading {
+	font-size:14px;
+}
+
+.media {
+	margin-top:15px;
+}
+
+
+.page-header {
+padding-bottom: 5px;
+margin: 0px 0 10px;
+border-bottom: 1px solid #eee;
+}

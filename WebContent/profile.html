@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html>
+<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+		<title>MicroBlogging - Profile</title>
+		
+		<!-- Google font -->
+		<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Gafata">
+		
+		<!-- Bootstrap CSS -->
+		<link rel="stylesheet" href="css/bootstrap.css"> 
+		
+		<!-- CSS style -->
+		<link rel="stylesheet" href="css/style.css"> 
+		
+		<!-- jQuery -->
+		<script src="js/jquery-2.1.1.min.js"></script>
+		
+		<!-- Bootstrap JS -->
+		<script src="js/bootstrap.min.js"></script>
+		
+		<!-- AngularJS library -->
+	<script src= "http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
+			
+				<script>
+		
+		// get Param from url fun
+		function getUrlParameter(sParam)
+		{
+			var sPageURL = window.location.search.substring(1);
+			var sURLVariables = sPageURL.split('&'); // in case there's more thean 1 param split by &
+			
+			//loop over the splited url array and return sParam
+			for (var i = 0; i < sURLVariables.length; i++) {
+				
+				var sParameterName = sURLVariables[i].split('=');
+				if (sParameterName[0] == sParam){
+				        return sParameterName[1];
+				        }
+				    }
+				} 
+			
+		var uID,gNickname; // Global Variables
+		uID = getUrlParameter("name"); // get name param value
+		
+		$(document).ready(function() {
+		
+	    $(window).load(function () {
+	        setTimeout(function(){
+
+			$.ajax({
+		        url: "/MicroBlog/user/SessionAuth",
+		        type: 'GET',
+		        contentType: "application/json; charset=utf-8",
+		        success: function(data) {
+		        	if(data.result == "success"){
+						//console.log("success");
+						gNickname = data.nickname; // set Global variable gNickname
+						//hide post Message textarea if user is in another user profile
+					    if(typeof(uID) != "undefined" && uID != gNickname){
+					    	$('#PostMsgDiv').hide(); // hide post Msg Div
+					    	}
+		    		}
+		        }
+		    	})
+				
+		    	.done(function (data) {
+		    		if(data.result == "success"){
+						console.log("success");
+		    		}
+			        	else{ window.location.pathname = "/MicroBlog/index.html"; } // if Authintication failed send user to index.html
+		    	 })
+		    	 .fail( function (data) {
+		    		 console.log(data);
+		    	 });
+			$('#preloader').fadeOut('slow', function () { // fadeOut preloader in 2 sec
+				//$(".navbar").fadeIn(); // on the same time make navBar fadeIn
+            });
+        },2000);
+
+    });
+	    
+	    var gurl;
+	    // name Param dosen't exist the call GetUserInfo
+	    if(typeof(uID) == "undefined"){
+	    	gurl = "/MicroBlog/user/GetUserInfo";
+	    }
+	    else{
+	    	// else GetUserInfo with uID
+	    	gurl = "/MicroBlog/user/GetUserInfo/name/" + uID;
+	    	$('#profileLi').removeClass("active");
+	    }
+	    $.ajax({
+	        url: gurl,
+	        type: 'GET',
+	        contentType: "application/json; charset=utf-8"
+	    	})
+			
+	    	.done(function (data) {
+	    		if(data.id != "null"){ // if id not null then everything is ok
+	    			$('#description').text(data.Description); // change <p> descreption text
+	    			$('#nickname').text(data.Nickname);
+	    			$('#followersBtn').html("<span id='followers_count_span'>"+data.Follower_count+"</span>" + " Followers");
+	    			$('#followingBtn').html("<span id='following_count_span'>"+data.Following_count+"</span>" + " Following");
+	    			if(data.PhotoURL != ""){ // if PhotoURL not empty then change img profile src attribute
+	    				$('#profilePhoto').attr("src",data.PhotoURL);
+	    				}
+					//console.log("success");
+	    		}
+		        	else{  }
+	    	 })
+	    	 .fail( function (data) {
+	    		 console.log(data);
+	    	 });
+	    
+	    //Logout user fun
+	    $("#logout_btn").click(function() {
+	    	$.ajax({
+		        url: "/MicroBlog/user/LogoutUser",
+		        type: 'GET'
+		    	}).done(function (data) {
+		    		if(data.result == "success"){
+						window.location.pathname = "/MicroBlog/index.html";
+		    		}
+		    	 }).fail( function (data) {
+		    		 console.log(data.result);
+		    	 });
+	    	
+	    	});
+	    
+	    
+		});
+	    
+
+		
+		</script>
+		
+</head>
+<body>
+<div id="TopDiv"></div>
+<div id="preloader"></div>
+ <!-- Fixed navbar -->
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">MicroBlog</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="microblog.html"><span class="glyphicon glyphicon-globe" aria-hidden="true"></span> Discover</a></li>
+            <li><a href="popular_topics.html"><span class="glyphicon glyphicon-certificate" aria-hidden="true"></span> TOP Topics</a></li>
+            <li id="profileLi" class="active"><a href="profile.html"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> My Profile</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="#" id="logout_btn">Logout</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+
+      <!-- Main component for a primary marketing message or call to action -->
+      <div class="jumbotron">
+        
+       <div class="row">
+  <div class="col-md-4">
+    <div class="thumbnail">
+      <img id="profilePhoto" class="img-circle" src="images/default-photo.png" alt="Profile Photo"> <!-- circle image -->
+      <div class="caption">
+        <h3 id="nickname" ></h3>
+        <p id="description" ></p>
+        <p>
+        <button type="button" id="followersBtn" data-toggle="modal" data-target="#ModalDialog" data-id="Followers" title="Followers" class="btn btn-primary" role="button"></button>
+        <button type="button" id="followingBtn" data-toggle="modal" data-target="#ModalDialog" data-id="Following" title="Following" class="btn btn-default" role="button"></button>
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-8">
+  
+  <div class="page-header">
+  <h2>Last 10 Messages</h2>
+</div>
+<div class="alert alert-success alert-dismissible alertRepublishSuc" role="alert">
+Message Republished successfuly!
+</div>
+<div class="alert alert-success alert-dismissible alertPostMsgSuc" role="alert">
+Message Posted successfuly!
+</div>
+<div class="alert alert-danger alert-dismissible alertPostMsgEmpty" role="alert">
+Please Enter a message!
+</div>
+<div class="alert alert-danger alert-dismissible FollowMsgDiv" role="alert">
+</div>
+<div class="messages-container" ng-app="MessagesApp" ng-controller="MessagesController">
+
+		<div id="PostMsgDiv" class="media">
+			<div class="form-group">
+				<textarea class="form-control" id="txtMsg" ng-model="txtMsg" maxlength="140" placeholder="Your Message" cols="8" rows="4"></textarea>
+			</div>
+			<div class="form-group pull-right">
+				<button type="button" class="btn btn-primary" ng-click="btn_post_msg();">Post</button>
+			</div>
+		</div>
+		<div class="MessagesDiv">
+		<div ng-repeat="msg in msgsArray" class="media">
+		  <a class="media-left" href="#">
+		    <img class="msgPhoto" src="" alt="Photo">
+		  </a>
+		  <div class="media-body">
+		   	<h4 class="media-heading">
+		    <b><a ng-href="{{getNicknameAsLink(msg.Posted_by_Nickname);}}">
+		    @{{ msg.Posted_by_Nickname }}</a></b>
+		    {{ msg.pubDate }}
+		    </h4>
+		    <p ng-bind-html="TrustMsgContent(msg.Content)">
+		   <!--   {{ msg.Content }}-->
+		    </p>
+		    <span>
+		    <a href="javascript:void(0);" ng-click="RepublishMsg(msg.Content,msg.msgID);">Republish</a> |
+		    <a href="javascript:void(0);" ng-click="ReplyToMsgModalPop(msg.Posted_by_Nickname);">Reply</a> |
+		    <a href="javascript:void(0);" ng-click="FollowUser(msg.Posted_by_userID,msg.Posted_by_Nickname);">Follow</a>
+		    </span>
+		  </div>
+		  <hr>
+		</div>
+		</div>
+
+
+<!-- Reply Modal -->
+
+<div class="modal fade" id="MsgReplyModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Reply To Message</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+				<textarea autofocus class="form-control" ng-model="replyText" id="replyText" maxlength="140" placeholder="Your Message" cols="8" rows="4"></textarea>
+			</div>
+			<div class="form-group pull-right">
+				<button type="button" class="btn btn-primary" ng-click="ReplyToMsg();" >Post Reply</button>
+			</div>
+        <br><br>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Reply Modal -->
+
+</div>
+  </div>
+</div> 
+        
+      </div>
+
+    </div> <!-- /container -->
+ 
+ <!-- AngularJS module -->
+ 
+ <script>
+ var app = angular.module('MessagesApp',[])
+	.controller('MessagesController', ['$scope','$sce','$http', function($scope,$sce,$http) {
+		
+		//Get All Users in json array to check name if exist before parsing it.
+		var usersArray;
+		$http.get("/MicroBlog/user/GetAllUsers")
+			.success(function(response){
+				usersArray = response;
+	});
+
+
+		var gurl;
+	    if(typeof(uID) == "undefined"){
+	    	gurl = "/MicroBlog/user/GetUserMessages";
+	    }
+	    else{ 
+	    	gurl = "/MicroBlog/user/GetUserMessages/name/" + uID;
+	    }
+	
+	//$http is AngularJS way to do ajax-like communications
+	$http.get(gurl)
+			.success(function(response) {
+			   $scope.msgsArray = response; //this variable will hold the Msgs of users
+			   
+			});
+
+	// make nickname clickable
+	$scope.getNicknameAsLink = function(nickname)
+	{
+	return "profile.html?name="+nickname;
+	};
+	
+	// post message func
+	$scope.btn_post_msg = function() {
+		
+        if($('#txtMsg').val().trim().length > 0){
+        	
+        	//create message object
+    		var Msg = new Object();
+    	    Msg.Content = $scope.txtMsg;
+    	    
+    	  //Make and http call to the server
+        	var req = $http({
+                method: "post",
+                url: "/MicroBlog/message/PostMessage",
+                dataType: 'json',
+                contentType: "application/json; charset=utf-8",
+    	        data: JSON.stringify(Msg)
+            });
+    	    
+    	    req.success(function(response) {
+    	    	//check if user is in another user profile in order update messages in advance.
+    	    	if(gNickname == uID || typeof(uID) == "undefined"){
+    	    	$scope.msgsArray = response; //this variable will hold the Msgs of users
+    	    	}
+    	    	$('.alertPostMsgSuc').show(1000).delay(3000).hide(1000); // show for 3 second and hide
+    	    	$scope.txtMsg = "";
+    		});	
+
+        }
+        else{
+        	$('.alertPostMsgEmpty').show(1000).delay(3000).hide(1000); // show for 3 second and hide
+        }
+    };
+	
+ 	// republish message fun
+	$scope.RepublishMsg = function(Content,msgID){
+		
+ 		//create js object
+		var Msg = new Object();
+	    Msg.msgID = msgID;
+	    Msg.Content = Content;
+
+	    var req = $http({
+            method: "post",
+            url: "/MicroBlog/message/RepublishMsg",
+            dataType: 'json',
+            contentType: "application/json; charset=utf-8",
+	        data: JSON.stringify(Msg)
+        });
+	    
+	    req.success(function(response) {
+	    	//check if user is in another user profile in order update messages in advance.
+	    	if(gNickname == uID || typeof(uID) == "undefined"){
+	    	$scope.msgsArray = response; //this variable will hold the Msgs of users
+	    	}
+	    	//Scroll to top TopDiv positioned first on body
+	    	$('html, body').animate({
+	            scrollTop: $("#TopDiv").offset().top
+	        }, 1000);
+	    	$('.alertRepublishSuc').show(1000).delay(3000).hide(1000); // show for 3 second and hide
+		});
+	    
+		};
+	
+		// check if nickname is legal before parsing it
+		var isNicknameLegal = function(nickname) {
+			for(var i = 0 ; i< usersArray.length ; i++){
+				// if nickname exists return true, otherwise return false
+				if(usersArray[i].Nickname == nickname)
+					{
+					return true;
+					}
+			}
+			return false;
+		}
+		
+		// parse Nicknames fun
+		var parseUsername = function(text) {
+			// will add a link to a word starting with @ and contains A-Za-z and 0-9 & underscore, after checking it's legal nickname.
+			return text.replace(/[@]+[A-Za-z0-9-_]+/g, function(u) { 
+				var username = u.replace("@","");
+				if(isNicknameLegal(username)){
+					return u.link("profile.html?name="+username);	
+				}
+				else{
+					return "@"+username;
+				}
+			});
+		};
+		
+		//parse hashtags fun
+		var parseHashtag = function(text) {
+			return text.replace(/[#]+[A-Za-z0-9-_]+/g, function(t) {
+				var tag = t.replace("#",""); // %23
+				//return t.link("topic.html?search="+tag);
+				return t.link("topic.html#"+tag);
+			});
+		};
+
+	// show reply modal fun	
+	$scope.ReplyToMsgModalPop = function(nickname){
+		$scope.replyText = "@"+nickname; // set replyText textarea value to @nickname
+		$('#MsgReplyModal').modal('show'); // show reply modal 
+		};
+	
+	
+		// reply to message fun
+	$scope.ReplyToMsg = function(){
+	        if($scope.replyText !=''){
+	        	// create js object
+	    		var Msg = new Object();
+	    	    Msg.Content = $scope.replyText;
+	    	 	// make a call to the server
+	        	var req = $http({
+	                method: "post",
+	                url: "/MicroBlog/message/PostMessage",
+	                dataType: 'json',
+	                contentType: "application/json; charset=utf-8",
+	    	        data: JSON.stringify(Msg)
+	            });
+	    	    
+	    	    req.success(function(response) {
+	    	    	if(gNickname == uID || typeof(uID) == "undefined"){
+	    	    	$scope.msgsArray = response; //this variable will hold the Msgs of users
+	    	    	}
+	    			$('#MsgReplyModal').modal('hide'); // hide the modal
+	    	    	//Scroll to top TopDiv positioned first on body
+	    	    	$('html, body').animate({
+	    	            scrollTop: $("#TopDiv").offset().top
+	    	        }, 1000);
+	    	    	$('.alertPostMsgSuc').show(1000).delay(3000).hide(1000); // show for 3 second and hide
+	    		});	
+
+	        }
+	        else{
+	        alert('Please Enter a message!');
+	        }
+			
+			};
+		
+	// Follow user fun
+	$scope.FollowUser = function(userID,nickname){		
+	    
+		$http.get("/MicroBlog/FollowUser/id/"+userID)
+		.success(function(response) {
+			if(response.result == 'success'){
+		    	alert("You started following "+nickname);
+		    	// update the count of followers in the profile
+		    	var a = parseInt($('#followers_count_span').text())
+		    	a+=1;
+		    	$('#followers_count_span').html(a);
+		    	}
+		    	else if(response.result == 'fail')
+		    		{
+			    	//Scroll to top TopDiv positioned first on body
+			    	$('html, body').animate({
+			            scrollTop: $("#TopDiv").offset().top
+			        }, 1000);
+		    		$('.FollowMsgDiv').html(response.message+"@"+nickname).show(1000).delay(3000).hide(1000);
+		    		}
+		   
+		});
+		};
+		
+	$scope.TrustMsgContent = function(content){
+				var temp_content;
+				// parse message content and trust it as html.
+			    temp_content = parseUsername(content);
+			    temp_content = parseHashtag(temp_content);
+				return $sce.trustAsHtml(temp_content);
+		};
+		
+	
+}]);
+
+
+	
+</script>
+
+ <!-- AngularJS module -->  
+
+<!-- Modal Of Followers/Following -->
+<div class="modal fade" id="ModalDialog" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title"></h4>
+      </div>
+      <div class="modal-body">
+        
+        <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Nickname</th>
+          <th>Followers</th>
+        </tr>
+      </thead>
+      <tbody id="topTenTable">
+<!-- append will be done here -->
+      </tbody>
+    </table>
+        
+      </div>
+    </div>
+  </div>
+</div>    
+    
+    		    <!-- Modal Javascript initialization -->
+    <script>
+	
+    $('#MsgReplyModal').on('shown.bs.modal', function () {
+        $('#replyText').focus(); // as soon as the modal shown focus on textarea        
+    })
+    
+    
+    
+    
+    $('.msgPhoto').attr('src',$('#profilePhoto').attr('src'));	// change messages photo to src like profile big photo
+    
+    
+    // whenever modal is being shown 
+    $('#ModalDialog').on('show.bs.modal', function (event) {
+    	
+    	  var button = $(event.relatedTarget) // Get the button that triggered the modal
+    	  var param = button.data('id') // Extract info from data-* attributes of that button
+    	  $("#topTenTable").text(""); // reset table before calling ajax 
+    	  
+    	  	// change date according to if the user is loggedUser profile to use session or another user profile.
+			var data = new Array();
+    	  	data[0] = param;
+    	  	if(typeof(uID) == "undefined")
+    	  		{
+    	  		data[1] = "loggedUser";
+    	  		}
+    	  	else{
+        	  	data[1] = uID;
+    	  	}
+
+    	  //Make Ajax call to the server to get Follower/Following list of user
+    	  $.ajax({
+    		url: '/MicroBlog/user/GetUserFollowingOrFollower',
+		    type: 'POST',
+		    dataType: 'json',
+		    data: JSON.stringify(data),
+  	        contentType: "application/json; charset=utf-8"
+  	    	})
+  			
+  	    	.done(function (data) {
+  	    		var row =0;
+  	    		// loop over json array and append to the table of Followers/Following
+  	    		$.each(data, function(index, element) {
+  	    			row++;
+  	    		    $("#topTenTable").append("<tr><th scope='row'>"+ row + "</th>" + "<td><a href='profile.html?name=" + element.Nickname + "'>@" +element.Nickname+ "</td>"+"<td>"+element.Follower_count+"</td></tr>");
+  	    		});
+  	    		
+  	    	 })
+  	    	 .fail( function (data) {
+  	    		 console.log(data);
+  	    	 });
+    	  
+    	  var modal = $(this)
+    	  modal.find('.modal-title').text('My Top 10 ' + param) // change modal title according to param(Following/Follower)
+    	})
+    	
+	</script>
+    
+    <!-- Modal Javascript initialization -->
+    
+    <!-- Modal -->
+
+
+</body>
+</html>

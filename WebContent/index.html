@@ -1,0 +1,211 @@
+<html lang="en-US"><head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+		<title>MicroBlogging - Web Project</title>
+		
+		<!-- Google font for SEO purposes as well -->
+		<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Gafata">
+		
+		<!-- Bootstrap CSS -->
+		<link rel="stylesheet" href="css/bootstrap.css"> 
+		
+		<!-- CSS style -->
+		<link rel="stylesheet" href="css/style.css"> 
+		
+		<!-- jQuery -->
+		<script src="js/jquery-2.1.1.min.js"></script>
+		
+		<!-- Bootstrap JS -->
+		<script src="js/bootstrap.min.js"></script>
+		
+		<script>
+		
+
+		
+		$(document).ready(function() {
+			
+		    $(window).load(function () {
+		        setTimeout(function(){
+		        	//Authenticate Session before showing the page and after 2000ms show page or redirect.
+	        		$.ajax({
+	        	        url: "/MicroBlog/user/SessionAuth",
+	        	        type: 'GET',
+	        	        contentType: "application/json; charset=utf-8"
+	        	    	})
+	        			
+	        	    	.done(function (data) {
+	        	    		if(data.result == "success"){
+	        					//console.log("success");
+	        					// send user to the microblog if session was Authenticated
+	        					window.location.pathname = "/MicroBlog/microblog.html";
+	        	    		}
+	        	    	 })
+	        	    	 .fail( function (data) {
+	        	    		 console.log(data);
+	        	    	 });
+		        	//fadeOut preloader
+		            $('#preloader').fadeOut('slow', function () {  
+		            });
+		        },2000);
+
+		    }); 
+			
+			
+			<!--Name can't be blank function called on user input-->
+			$('#username').on('input', function() {
+				var input=$(this);
+				var is_username=input.val();
+				// if username is empty add invalid class
+				if(!is_username){
+					input.addClass("invalid");
+				}
+				else{
+					input.removeClass("invalid");
+				}
+			});
+			<!-- function called on user input -->
+			$('#password').on('input', function() {
+				var input=$(this);
+				var is_pass=input.val();
+				//if password is empty add invalid class
+				if(!is_pass){
+					input.addClass("invalid");
+				}
+				else{
+					input.removeClass("invalid");
+				}
+			});
+			
+			
+			<!-- after form submission validate inputs -->
+			$("#loginButton").click(function(event){
+				
+				var form_data=$("#loginForm").serializeArray(); // Get All HTML objects inside the form
+				var has_error=false;
+				
+				for (var input in form_data){ // loop over the objects
+					var element=$("#"+form_data[input]['name']); // concatinate # to the form input name to get the object
+					var invalid=element.hasClass("invalid");
+					if (invalid || !element.val() ){
+						element.addClass("invalid"); has_error=true;
+						}					
+				}
+				// if has_error true prevent from from submiting and show alert error message
+				if (has_error){
+					$('.alertUserInvalid').show(1000);
+					event.preventDefault(); // prevent form from sumbmitting
+				}
+				else{
+					//Make AJAX call with server
+					
+					$('.alertUserInvalid').hide();
+					var user = new Object();
+				    user.Username = $('#username').val();
+				    user.Password = $('#password').val();
+				    
+				    $.ajax({
+				        url: "/MicroBlog/user/LoginUser",
+				        type: 'POST',
+				        dataType: 'json',
+				        data: JSON.stringify(user),
+				        contentType: "application/json; charset=utf-8"
+				    	})
+						
+				    	.done(function (data) {
+				    		if(data.result == "success"){
+				    			// send user to microblog after hiding the error message
+				    			$('.alertUserInvalid').hide();
+								//console.log("success");
+								window.location.pathname = "/MicroBlog/microblog.html";
+				    		}
+				    		//if result not success show error message
+					        	else{ $('.alertUserInvalid').show(1000); console.log("Invalid user or password"); }
+				    	 })
+				    	 .fail( function (data) {
+				    		 console.log(data);
+				    	 });
+				    	
+				}
+			});
+			
+			
+			
+		});
+		
+		
+		</script>
+		
+		
+	</head>
+	
+	<body>
+	<div id="preloader"></div>
+		<div class="container">
+			<header class="header">
+				<h1>MicroBlogging Login</h1>
+			</header>
+			
+			<div class="content">
+				
+				
+				<article class="col-md-12">
+				
+					<!-- START Login form -->
+					
+					<div class="row">
+
+						<div class="col-md-3">
+						</div>
+					
+						<!-- Login form -->
+						<div class="col-md-6">
+							<div class="panel panel-form">
+								<!-- Form header -->
+								<div class="panel-heading">
+									<h2 class="title">Login</h2>
+									<p>Don't have an account? <a href="register.html">Register</a>.</p>
+								</div>
+								
+								<div class="panel-body">
+								<div class="alert alert-danger alert-dismissible alertUserInvalid" role="alert">INVALID USERNAME OR PASSWORD</div>
+									<form id="loginForm" role="form" action="/MicroBlog/user/LoginUser" method="POST">
+										<!-- Username -->
+										<div class="form-group">
+											<label for="username" class="control-label">Username</label>
+											<div>
+												<input type="text" name="username" class="form-control" id="username">
+											</div>
+										</div>
+										
+										<!-- Password -->
+										<div class="form-group">
+											<label for="password" class="control-label">Password</label>
+											<div>
+												<input type="password" name="password" class="form-control" id="password">
+											</div>
+										</div>
+										
+										<!-- Login button -->
+										<div class="form-group">
+											<button id="loginButton" type="button" class="btn btn-primary">Login</button>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
+						
+						
+						<div class="col-md-3">
+						</div>
+						
+					</div>
+					
+					<!-- END Login form -->
+					
+				</article>
+				
+				<div class="clearfix"></div>
+			</div>
+		</div>
+		
+</body></html>

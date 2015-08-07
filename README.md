@@ -89,3 +89,5 @@ Context context = new InitialContext();
       //is important for correct connection pool management
       //within Tomcat
 ```
+
+![alt tag](https://jmargieh.github.io/MicroBlog/WebContent/images/ERD/ERDdiagram.png)
